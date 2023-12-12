@@ -11,12 +11,16 @@ struct ContentView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
-    var currentUserID: String? = "user"
+    @AppStorage(CurrentUserDefaults.userID) var currentUserID: String?
+    @AppStorage(CurrentUserDefaults.displayName) var currentUserDisplayName: String?
+        
+    let feedPosts = PostArrayObject(shuffled: false)
+    let browsePosts = PostArrayObject(shuffled: true)
     
     var body: some View {
         TabView {
             NavigationView {
-                FeedView(posts: PostArrayObject(), title: "Feed")
+                FeedView(posts: feedPosts, title: "Feed")
             }
                 .tabItem {
                     Image(systemName: "book.fill")
@@ -24,7 +28,7 @@ struct ContentView: View {
                 }
             
             NavigationView {
-                BrowseView()
+                BrowseView(posts: browsePosts)
             }
                 .tabItem {
                     Image(systemName: "magnifyingglass")
@@ -38,9 +42,9 @@ struct ContentView: View {
                 }
 
             ZStack {
-                if currentUserID != nil {
+                if let userID = currentUserID, let displayName = currentUserDisplayName {
                     NavigationView {
-                        ProfileView(isMyProfile: true, profileDisplayName: "My Profile", profileUserID: "")
+                        ProfileView(isMyProfile: true, profileDisplayName: displayName, profileUserID: userID, posts: PostArrayObject(userID: userID))
                     }
                 } else {
                     SignUpView()
